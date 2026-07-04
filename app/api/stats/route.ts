@@ -9,16 +9,14 @@ export async function GET(): Promise<Response> {
   const sb = getSupabase();
   if (!sb) return NextResponse.json({ configured: false, deaths: 0, players: 0 });
 
-  const [{ data: gs }, { data: pc }] = await Promise.all([
-    sb.from("global_stats").select("total_deaths").eq("id", 1).maybeSingle(),
-    sb.from("player_count").select("total").eq("id", 1).maybeSingle(),
-  ]);
+  const { data } = await sb.rpc("get_global_stats");
+  const stats = (data ?? {}) as { deaths?: number; players?: number };
 
   return NextResponse.json(
     {
       configured: true,
-      deaths: Number(gs?.total_deaths ?? 0),
-      players: pc?.total ?? 0,
+      deaths: Number(stats.deaths ?? 0),
+      players: Number(stats.players ?? 0),
     },
     { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" } },
   );

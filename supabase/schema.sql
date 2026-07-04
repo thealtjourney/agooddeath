@@ -28,6 +28,8 @@ create or replace function public.submit_daily_run(
   p_build text
 ) returns jsonb
 language plpgsql
+security definer
+set search_path = public
 as $$
 declare
   v_best      int;
@@ -69,6 +71,8 @@ create or replace function public.get_daily_board(
   p_anon text
 ) returns jsonb
 language plpgsql
+security definer
+set search_path = public
 as $$
 declare
   v_top   jsonb;
@@ -152,6 +156,8 @@ create or replace function public.report_badges(
   p_badges text[]
 ) returns void
 language plpgsql
+security definer
+set search_path = public
 as $$
 declare
   b text;
@@ -175,4 +181,31 @@ begin
     end if;
   end loop;
 end;
+$$;
+
+-- Read functions (security definer so they bypass RLS regardless of API role).
+create or replace function public.get_global_stats()
+returns jsonb
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select jsonb_build_object(
+    'deaths',  coalesce((select total_deaths from public.global_stats where id = 1), 0),
+    'players', coalesce((select total from public.player_count where id = 1), 0)
+  );
+$$;
+
+create or replace function public.get_badge_counts()
+returns jsonb
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select jsonb_build_object(
+    'total',   coalesce((select total from public.player_count where id = 1), 0),
+    'holders', coalesce((select jsonb_object_agg(badge_id, holders) from public.badge_counts), '{}'::jsonb)
+  );
 $$;
