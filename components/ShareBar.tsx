@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { LifeRecord } from "../lib/engine/types.js";
 import type { ParishRecord } from "../lib/content/themes/peasant/record.js";
 import { runUrl, ogImagePath } from "../lib/game/share-url.js";
+import { event } from "../lib/game/analytics.js";
 
 export function ShareBar({
   life,
@@ -39,6 +40,7 @@ export function ShareBar({
 
   const share = async () => {
     setBusy(true);
+    event("share", { method: "native", shared });
     try {
       const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
       const file = await fetchImage();
@@ -60,6 +62,7 @@ export function ShareBar({
 
   const download = async () => {
     setBusy(true);
+    event("download_card", { age: record.score });
     try {
       const blob = await (await fetch(imgPath)).blob();
       const objUrl = URL.createObjectURL(blob);
@@ -115,6 +118,7 @@ export function ShareBar({
           href={xIntent}
           target="_blank"
           rel="noreferrer"
+          onClick={() => event("share", { method: "x", shared })}
           className={`${btn} ${ghost} flex items-center justify-center`}
         >
           Post to X

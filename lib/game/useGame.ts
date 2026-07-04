@@ -5,6 +5,7 @@ import { simulate } from "../engine/simulate.js";
 import type { Build, GachaOption, LifeRecord } from "../engine/types.js";
 import { theme, pullGacha, makeRng, dailySeed } from "./theme-ui.js";
 import { recordResult } from "./stats-store.js";
+import { event } from "./analytics.js";
 
 export type Phase = "title" | "build" | "pulling" | "simulating" | "dead";
 
@@ -90,19 +91,28 @@ export function useGame() {
 
   const pull = useCallback(() => {
     const rng = makeRng(`pull:${Date.now()}:${Math.floor(Math.random() * 1e9)}`);
-    dispatch({ type: "pull", gacha: pullGacha(rng) });
+    const gacha = pullGacha(rng);
+    event("gacha_pull", { rarity: gacha.rarity, id: gacha.id });
+    dispatch({ type: "pull", gacha });
   }, []);
 
   const startSim = useCallback(() => {
     if (!state.gacha) return;
     const build: Build = { choices: { ...state.selections }, gachaId: state.gacha.id };
     const life = simulate(build, state.seed, theme);
+    event("run_started", { ...build.choices, gacha: build.gachaId, daily: state.daily });
     dispatch({ type: "startSim", life });
-  }, [state.gacha, state.selections, state.seed]);
+  }, [state.gacha, state.selections, state.seed, state.daily]);
 
   const finish = useCallback(() => {
     const life = state.life;
     if (!life) return;
+    event("run_completed", {
+      age: life.ageAtDeath,
+      cause: life.deathCauseId,
+      good: life.goodDeath,
+      daily: state.daily,
+    });
     const { stats, isNewBest } = recordResult({
       age: life.ageAtDeath,
       dailyDate: state.daily ? state.seed : undefined,
