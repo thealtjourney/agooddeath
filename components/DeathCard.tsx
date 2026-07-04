@@ -41,7 +41,7 @@ export function DeathCard({
   life: LifeRecord;
   daily: boolean;
   mode?: "play" | "shared";
-  result?: { isNewBest: boolean; streak: number; bestAge: number };
+  result?: import("../lib/game/useGame.js").RunResult;
   onAgain?: () => void;
   onFreeplay?: () => void;
   onHome?: () => void;
@@ -145,16 +145,31 @@ export function DeathCard({
             <CountUp value={record.score} duration={900} />
           </p>
           {!shared && result && (
-            <p className="mt-2 font-body text-[13px] text-ink-soft">
-              {result.isNewBest ? (
+            <div className="mt-2 font-body text-[13px] text-ink-soft">
+              {daily ? (
+                <>
+                  {result.dailyBeaten ? (
+                    <span className="font-semibold text-rubric">
+                      You beat your earlier attempt today!
+                    </span>
+                  ) : result.dailyBest > life.ageAtDeath ? (
+                    <>
+                      Today&rsquo;s best: {result.dailyBest} — try a different build to
+                      beat it.
+                    </>
+                  ) : (
+                    <span className="font-semibold text-rubric">
+                      Your best on today&rsquo;s gauntlet.
+                    </span>
+                  )}
+                  {result.streak > 1 && <> · {result.streak}-day streak</>}
+                </>
+              ) : result.isNewBest ? (
                 <span className="font-semibold text-rubric">A new personal best!</span>
               ) : (
                 <>Your best: {result.bestAge}</>
               )}
-              {daily && result.streak > 1 && (
-                <> · {result.streak}-day streak</>
-              )}
-            </p>
+            </div>
           )}
         </div>
 

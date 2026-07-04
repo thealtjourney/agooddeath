@@ -10,19 +10,23 @@ import type { WorldYear } from "../../../engine/types.js";
 export function buildWorld(rng: Rng, startAge: number, maxAge: number): WorldYear[] {
   const span = maxAge - startAge + 1;
 
-  // Pre-roll world timelines.
+  // Pre-roll world timelines. Days vary a lot so each daily gauntlet differs:
+  // some are plague-ridden, some war-torn, some lean, some a rare quiet age.
   const plagueYears = new Set<number>();
-  // ~2-4 plague years scattered across a lifetime
-  const plagueCount = 2 + rng.int(3);
+  const plagueCount = rng.int(5); // 0-4 plague years
   for (let i = 0; i < plagueCount; i++) plagueYears.add(startAge + rng.int(span));
 
-  // A war window: a contiguous 0-4 year stretch, maybe.
+  // A war window: a contiguous 1-4 year stretch, ~55% of worlds.
   let warStart = -1;
   let warLen = 0;
-  if (rng.chance(0.6)) {
+  if (rng.chance(0.55)) {
     warStart = startAge + rng.int(span);
     warLen = 1 + rng.int(4);
   }
+
+  // ~30% of worlds are "lean" — famine-prone; the rest are gentler on harvests.
+  const leanWorld = rng.chance(0.3);
+  const badHarvestRate = leanWorld ? 0.3 : 0.1;
 
   const years: WorldYear[] = [];
   for (let age = startAge; age <= maxAge; age++) {
@@ -37,9 +41,9 @@ export function buildWorld(rng: Rng, startAge: number, maxAge: number): WorldYea
       flags.push("warYear");
       mult["war"] = 3;
     }
-    // harvest wobble every year
+    // harvest wobble every year (lean worlds fail far more often)
     const roll = rng.next();
-    if (roll < 0.18) {
+    if (roll < badHarvestRate) {
       flags.push("badHarvest");
       mult["harvest"] = (mult["harvest"] ?? 1) * 2;
     } else if (roll > 0.85) {
@@ -50,6 +54,54 @@ export function buildWorld(rng: Rng, startAge: number, maxAge: number): WorldYea
     years.push({ age, flags, categoryMultipliers: mult });
   }
   return years;
+}
+
+export interface WorldBriefing {
+  plagues: number;
+  famines: number;
+  warYears: number;
+  warStartAge: number | null;
+}
+
+/** Summarise a world's threats so players can strategise against them. */
+export function summariseWorld(world: WorldYear[]): WorldBriefing {
+  let plagues = 0;
+  let famines = 0;
+  let warYears = 0;
+  let warStartAge: number | null = null;
+  for (const y of world) {
+    if (y.flags.includes("plagueYear")) plagues++;
+    if (y.flags.includes("badHarvest")) famines++;
+    if (y.flags.includes("warYear")) {
+      warYears++;
+      if (warStartAge === null) warStartAge = y.age;
+    }
+  }
+  return { plagues, famines, warYears, warStartAge };
+}
+
+function ageBand(age: number): string {
+  if (age < 20) return "your youth";
+  if (age < 30) return "your twenties";
+  if (age < 40) return "your thirties";
+  if (age < 55) return "middle age";
+  return "old age";
+}
+
+/** Human threat lines for the daily briefing, e.g. ["Two plague years", ...]. */
+export function briefingLines(b: WorldBriefing): string[] {
+  const lines: string[] = [];
+  const num = (n: number) => ["no", "one", "two", "three", "four", "five", "six"][n] ?? `${n}`;
+  if (b.plagues > 0)
+    lines.push(`${cap(num(b.plagues))} plague ${b.plagues === 1 ? "year" : "years"}`);
+  if (b.warStartAge !== null) lines.push(`War in ${ageBand(b.warStartAge)}`);
+  if (b.famines >= 12) lines.push("Lean harvests");
+  if (lines.length === 0) lines.push("A rare quiet age");
+  return lines;
+}
+
+function cap(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 /** The day's headline theme, for the site header. */

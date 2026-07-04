@@ -1,7 +1,9 @@
 "use client";
 
-import { SLOTS, worldHeadlineFor, prettyDate } from "../lib/game/theme-ui.js";
+import { useEffect, useMemo, useState } from "react";
+import { SLOTS, worldHeadlineFor, prettyDate, dailyBriefing } from "../lib/game/theme-ui.js";
 import type { GameState } from "../lib/game/useGame.js";
+import { loadStats } from "../lib/game/stats-store.js";
 import { ChoiceIcon } from "./ChoiceIcon.js";
 
 export function BuildScreen({
@@ -18,6 +20,16 @@ export function BuildScreen({
   onHome: () => void;
 }) {
   const headline = worldHeadlineFor(state.seed);
+  const threats = useMemo(() => dailyBriefing(state.seed), [state.seed]);
+  const [best, setBest] = useState<{ attempts: number; best: number } | null>(null);
+
+  useEffect(() => {
+    if (!state.daily) return;
+    const s = loadStats();
+    if (s.dailyDate === state.seed && s.dailyAttempts > 0) {
+      setBest({ attempts: s.dailyAttempts, best: s.dailyBest });
+    }
+  }, [state.daily, state.seed]);
 
   return (
     <div className="relative mx-auto w-full max-w-xl px-4 pb-28 pt-8">
@@ -39,6 +51,34 @@ export function BuildScreen({
         </div>
         <p className="mt-2 font-body text-[15px] italic text-rubric">{headline}</p>
       </header>
+
+      {state.daily && (
+        <div className="mb-6 rounded-sm border border-ink/25 bg-parchment-light/40 px-4 py-3">
+          <div className="flex items-baseline justify-between">
+            <span className="font-body text-[11px] uppercase tracking-[0.3em] text-ink-faded">
+              The gauntlet this day
+            </span>
+            {best && (
+              <span className="font-body text-[11px] text-ink-faded">
+                Best {best.best} · try {best.attempts + 1}
+              </span>
+            )}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {threats.map((t, i) => (
+              <span
+                key={i}
+                className="rounded-sm border border-rubric/40 bg-parchment px-2 py-0.5 font-body text-[12px] text-ink"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          <p className="mt-2 font-body text-[13px] italic text-ink-faded">
+            Everyone faces the same world today. Build a peasant to outlast it.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-5">
         {SLOTS.map((slot) => (

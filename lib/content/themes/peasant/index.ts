@@ -34,7 +34,7 @@ export const peasantTheme: ThemeConfig = {
 };
 
 export { renderParishRecord } from "./record.js";
-export { worldHeadline } from "./world.js";
+export { worldHeadline, summariseWorld, briefingLines } from "./world.js";
 export {
   TRADES,
   VILLAGES,

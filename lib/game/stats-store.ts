@@ -12,9 +12,12 @@ export interface PlayStats {
   runs: number;
   streak: number;
   lastDailyDate?: string; // ISO yyyy-mm-dd of last completed daily
+  dailyDate?: string; // date the gauntlet attempts/best below refer to
+  dailyAttempts: number; // attempts on today's gauntlet
+  dailyBest: number; // best age on today's gauntlet
 }
 
-const EMPTY: PlayStats = { bestAge: 0, runs: 0, streak: 0 };
+const EMPTY: PlayStats = { bestAge: 0, runs: 0, streak: 0, dailyAttempts: 0, dailyBest: 0 };
 
 export function loadStats(): PlayStats {
   if (typeof window === "undefined") return { ...EMPTY };
@@ -27,6 +30,9 @@ export function loadStats(): PlayStats {
       runs: p.runs ?? 0,
       streak: p.streak ?? 0,
       lastDailyDate: p.lastDailyDate,
+      dailyDate: p.dailyDate,
+      dailyAttempts: p.dailyAttempts ?? 0,
+      dailyBest: p.dailyBest ?? 0,
     };
   } catch {
     return { ...EMPTY };
@@ -55,17 +61,32 @@ function yesterdayOf(iso: string): string {
 export function recordResult(opts: {
   age: number;
   dailyDate?: string;
-}): { stats: PlayStats; isNewBest: boolean } {
+}): { stats: PlayStats; isNewBest: boolean; dailyBeaten: boolean } {
   const s = loadStats();
   const isNewBest = opts.age > s.bestAge;
   if (isNewBest) s.bestAge = opts.age;
   s.runs += 1;
 
-  if (opts.dailyDate && s.lastDailyDate !== opts.dailyDate) {
-    s.streak = s.lastDailyDate === yesterdayOf(opts.dailyDate) ? s.streak + 1 : 1;
-    s.lastDailyDate = opts.dailyDate;
+  let dailyBeaten = false;
+  if (opts.dailyDate) {
+    // Streak advances once per calendar day.
+    if (s.lastDailyDate !== opts.dailyDate) {
+      s.streak = s.lastDailyDate === yesterdayOf(opts.dailyDate) ? s.streak + 1 : 1;
+      s.lastDailyDate = opts.dailyDate;
+    }
+    // Gauntlet attempts + best reset each new day.
+    if (s.dailyDate !== opts.dailyDate) {
+      s.dailyDate = opts.dailyDate;
+      s.dailyAttempts = 0;
+      s.dailyBest = 0;
+    }
+    s.dailyAttempts += 1;
+    if (opts.age > s.dailyBest) {
+      s.dailyBest = opts.age;
+      dailyBeaten = s.dailyAttempts > 1; // beat a previous try today
+    }
   }
 
   save(s);
-  return { stats: s, isNewBest };
+  return { stats: s, isNewBest, dailyBeaten };
 }

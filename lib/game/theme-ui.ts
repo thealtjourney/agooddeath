@@ -10,6 +10,8 @@ import {
   ITEMS,
   renderParishRecord,
   worldHeadline,
+  summariseWorld,
+  briefingLines,
 } from "../content/themes/peasant/index.js";
 import { pullGacha } from "../content/themes/peasant/gacha.js";
 import { buildWorld } from "../content/themes/peasant/world.js";
@@ -54,6 +56,13 @@ export function worldHeadlineFor(seed: string): string {
   const rng = makeRng(`${theme.id}:${seed}`);
   const world = buildWorld(rng, theme.startAge, theme.maxAge);
   return worldHeadline(world);
+}
+
+/** Today's threats, revealed so players can build to survive them. */
+export function dailyBriefing(seed: string): string[] {
+  const rng = makeRng(`${theme.id}:${seed}`);
+  const world = buildWorld(rng, theme.startAge, theme.maxAge);
+  return briefingLines(summariseWorld(world));
 }
 
 /** Pretty date for the card footer, e.g. "4 July 2026". */

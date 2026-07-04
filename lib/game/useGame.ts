@@ -13,6 +13,9 @@ export interface RunResult {
   isNewBest: boolean;
   streak: number;
   bestAge: number;
+  dailyAttempts: number;
+  dailyBest: number;
+  dailyBeaten: boolean;
 }
 
 export interface GameState {
@@ -113,13 +116,20 @@ export function useGame() {
       good: life.goodDeath,
       daily: state.daily,
     });
-    const { stats, isNewBest } = recordResult({
+    const { stats, isNewBest, dailyBeaten } = recordResult({
       age: life.ageAtDeath,
       dailyDate: state.daily ? state.seed : undefined,
     });
     dispatch({
       type: "finish",
-      result: { isNewBest, streak: stats.streak, bestAge: stats.bestAge },
+      result: {
+        isNewBest,
+        streak: stats.streak,
+        bestAge: stats.bestAge,
+        dailyAttempts: stats.dailyAttempts,
+        dailyBest: stats.dailyBest,
+        dailyBeaten,
+      },
     });
   }, [state.life, state.daily, state.seed]);
 
