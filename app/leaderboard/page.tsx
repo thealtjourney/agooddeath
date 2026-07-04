@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSupabase } from "../../lib/server/supabase.js";
 import { worldHeadlineFor, prettyDate } from "../../lib/game/theme-ui.js";
 import { YourRank } from "../../components/YourRank.js";
+import { NavBar } from "../../components/NavBar.js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -65,15 +66,10 @@ export default async function LeaderboardPage({
 
   return (
     <main className="parchment-grain relative min-h-screen">
+      <NavBar />
       <div className="mx-auto max-w-xl px-4 py-10">
         <header className="mb-6 text-center">
-          <Link
-            href="/"
-            className="font-body text-xs uppercase tracking-widest text-ink-faded hover:text-ink"
-          >
-            ← A Good Death
-          </Link>
-          <h1 className="mt-3 font-black text-4xl leading-none text-ink">
+          <h1 className="font-black text-4xl leading-none text-ink">
             The Parish Register
           </h1>
           <p className="mt-2 font-body text-sm text-ink-faded">
