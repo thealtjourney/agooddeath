@@ -6,10 +6,12 @@ import { renderParishRecord, theme, prettyDate } from "../lib/game/theme-ui.js";
 import { awardBadges } from "../lib/engine/badges.js";
 import { recordRun, type BadgeState } from "../lib/game/badges-store.js";
 import { rarityService, type BadgeRarity } from "../lib/game/rarity.js";
+import { encodeBuild } from "../lib/game/share-url.js";
 import { ShareBar } from "./ShareBar.js";
 import { WoodcutIcon } from "./WoodcutIcon.js";
 import { BadgeStrip } from "./BadgeStrip.js";
 import { Reliquary } from "./Reliquary.js";
+import { Leaderboard } from "./Leaderboard.js";
 
 type Variant = "standard" | "plague" | "good";
 
@@ -166,6 +168,10 @@ export function DeathCard({
           readOnly={shared}
           onOpen={() => setReliquaryOpen(true)}
         />
+
+        {daily && !shared && (
+          <Leaderboard seed={life.seed} b={encodeBuild(life.build)} />
+        )}
 
         <footer className="mt-5 flex items-center justify-between font-body text-[11px] text-ink-faded">
           <span>agooddeath.app</span>
