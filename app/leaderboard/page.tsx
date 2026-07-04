@@ -57,19 +57,10 @@ export default async function LeaderboardPage({
   const configured = Boolean(sb);
 
   if (sb) {
-    const { data } = await sb
-      .from("daily_runs")
-      .select("name, age, build")
-      .eq("seed", date)
-      .order("age", { ascending: false })
-      .order("updated_at", { ascending: true })
-      .limit(50);
-    rows = (data as Row[] | null) ?? [];
-    const { count } = await sb
-      .from("daily_runs")
-      .select("*", { count: "exact", head: true })
-      .eq("seed", date);
-    total = count ?? 0;
+    const { data } = await sb.rpc("get_daily_board", { p_seed: date, p_anon: "" });
+    const board = (data ?? {}) as { top?: Row[]; total?: number };
+    rows = board.top ?? [];
+    total = board.total ?? 0;
   }
 
   return (

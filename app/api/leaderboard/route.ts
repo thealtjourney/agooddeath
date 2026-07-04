@@ -19,39 +19,31 @@ export async function GET(req: Request): Promise<Response> {
     return NextResponse.json({ error: "bad seed" }, { status: 400 });
   }
 
-  const { data: top } = await sb
-    .from("daily_runs")
-    .select("name, age, build")
-    .eq("seed", seed)
-    .order("age", { ascending: false })
-    .order("updated_at", { ascending: true })
-    .limit(50);
+  const { data, error } = await sb.rpc("get_daily_board", {
+    p_seed: seed,
+    p_anon: anonId ?? "",
+  });
 
-  const { count: total } = await sb
-    .from("daily_runs")
-    .select("*", { count: "exact", head: true })
-    .eq("seed", seed);
-
-  let you: { rank: number; age: number } | null = null;
-  if (anonId) {
-    const { data: mine } = await sb
-      .from("daily_runs")
-      .select("age")
-      .eq("seed", seed)
-      .eq("anon_id", anonId)
-      .maybeSingle();
-    if (mine) {
-      const { count: better } = await sb
-        .from("daily_runs")
-        .select("*", { count: "exact", head: true })
-        .eq("seed", seed)
-        .gt("age", mine.age);
-      you = { rank: (better ?? 0) + 1, age: mine.age };
-    }
+  if (error) {
+    return NextResponse.json(
+      { configured: true, top: [], total: 0, you: null },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
+  const board = (data ?? {}) as {
+    top?: unknown[];
+    total?: number;
+    you?: { rank: number; age: number } | null;
+  };
+
   return NextResponse.json(
-    { configured: true, top: top ?? [], total: total ?? 0, you },
+    {
+      configured: true,
+      top: board.top ?? [],
+      total: board.total ?? 0,
+      you: board.you ?? null,
+    },
     // The board must always reflect the latest writes — no stale caching.
     { headers: { "Cache-Control": "no-store" } },
   );

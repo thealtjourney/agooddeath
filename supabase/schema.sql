@@ -61,6 +61,48 @@ begin
 end;
 $$;
 
+-- Read the board for a day in ONE SQL round-trip: top 50, total, and the
+-- caller's rank. Computed in SQL (same path as submit) so the counts always
+-- agree with what was written.
+create or replace function public.get_daily_board(
+  p_seed text,
+  p_anon text
+) returns jsonb
+language plpgsql
+as $$
+declare
+  v_top   jsonb;
+  v_total int;
+  v_mine  int;
+  v_rank  int;
+begin
+  select coalesce(jsonb_agg(t), '[]'::jsonb) into v_top
+  from (
+    select name, age, build
+    from public.daily_runs
+    where seed = p_seed
+    order by age desc, updated_at asc
+    limit 50
+  ) t;
+
+  select count(*) into v_total from public.daily_runs where seed = p_seed;
+
+  select age into v_mine
+    from public.daily_runs where seed = p_seed and anon_id = p_anon;
+  if v_mine is not null then
+    select count(*) + 1 into v_rank
+      from public.daily_runs where seed = p_seed and age > v_mine;
+  end if;
+
+  return jsonb_build_object(
+    'top',   v_top,
+    'total', v_total,
+    'you',   case when v_mine is null then null
+                  else jsonb_build_object('rank', v_rank, 'age', v_mine) end
+  );
+end;
+$$;
+
 -- ============================================================
 -- Global badge rarity (distinct players who have earned each badge)
 -- ============================================================
@@ -89,10 +131,19 @@ create table if not exists public.player_count (
 insert into public.player_count (id, total) values (1, 0)
   on conflict (id) do nothing;
 
+-- Global vanity counter: total deaths (every completed run, daily or freeplay).
+create table if not exists public.global_stats (
+  id           int primary key,
+  total_deaths bigint not null default 0
+);
+insert into public.global_stats (id, total_deaths) values (1, 0)
+  on conflict (id) do nothing;
+
 alter table public.players       enable row level security;
 alter table public.badge_holders enable row level security;
 alter table public.badge_counts  enable row level security;
 alter table public.player_count  enable row level security;
+alter table public.global_stats  enable row level security;
 
 -- Report a run's earned badges. Idempotent: each (player, badge) counts once
 -- ever, and each player counts once toward the total. Safe to call every run.
@@ -105,6 +156,9 @@ as $$
 declare
   b text;
 begin
+  -- one completed run = one death, counted here (fires once per run)
+  update public.global_stats set total_deaths = total_deaths + 1 where id = 1;
+
   insert into public.players (anon_id) values (p_anon)
     on conflict (anon_id) do nothing;
   if found then

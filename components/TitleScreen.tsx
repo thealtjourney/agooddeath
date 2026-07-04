@@ -18,6 +18,7 @@ import { WoodcutIcon } from "./WoodcutIcon.js";
 import { Reliquary } from "./Reliquary.js";
 import { SpecimenTicker } from "./SpecimenTicker.js";
 import { Flourish } from "./Flourish.js";
+import { DeathToll } from "./DeathToll.js";
 
 export function TitleScreen({
   onDaily,
@@ -95,6 +96,8 @@ export function TitleScreen({
             Freeplay
           </button>
         </div>
+
+        <DeathToll />
 
         {returning && (
           <div className="mt-7 w-full max-w-xs">
