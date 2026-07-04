@@ -4,20 +4,28 @@
 const ID_KEY = "agd:anon:v1";
 const NAME_KEY = "agd:name:v1";
 
+function newId(): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `a-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+// Per-page fallback so a device with localStorage blocked still gets a UNIQUE
+// id (never an empty string), so two such devices can never collide into one row.
+let memoryId: string | null = null;
+
 export function getAnonId(): string {
   if (typeof window === "undefined") return "";
   try {
     let id = window.localStorage.getItem(ID_KEY);
     if (!id) {
-      id =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : `a-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      id = newId();
       window.localStorage.setItem(ID_KEY, id);
     }
     return id;
   } catch {
-    return "";
+    if (!memoryId) memoryId = newId();
+    return memoryId;
   }
 }
 

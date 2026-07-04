@@ -47,10 +47,12 @@ export function Leaderboard({ seed, b }: { seed: string; b: string }) {
     return <Panel>The leaderboard is warming up. Check back once it&rsquo;s live.</Panel>;
   }
 
-  const total = data?.total ?? 0;
-  const you = data?.you ?? null;
+  // Rank + total come as one atomic pair from the submit RPC (always internally
+  // consistent); fall back to the freshly-fetched board if it's unavailable.
+  const rank = result?.rank ?? data?.you?.rank ?? null;
+  const total = result?.total ?? data?.total ?? 0;
   const outlived =
-    you && total > 1 ? Math.round(((total - you.rank) / (total - 1)) * 100) : null;
+    rank != null && total > 1 ? Math.round(((total - rank) / (total - 1)) * 100) : null;
 
   const commitName = () => {
     const n = draft.trim().slice(0, 20);
@@ -71,10 +73,10 @@ export function Leaderboard({ seed, b }: { seed: string; b: string }) {
         </span>
       </div>
 
-      {you && (
+      {rank != null && (
         <div className="mb-2 rounded-sm border border-rubric/40 bg-parchment-light/50 px-3 py-2 text-center">
           <span className="font-body text-[15px] text-ink">
-            You lie <span className="font-black text-rubric">#{you.rank}</span> of{" "}
+            You lie <span className="font-black text-rubric">#{rank}</span> of{" "}
             {total.toLocaleString("en-GB")}
             {outlived !== null && (
               <> — outlived {outlived}% of the parish today</>

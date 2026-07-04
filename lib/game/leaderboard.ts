@@ -46,6 +46,7 @@ export async function fetchLeaderboard(seed: string): Promise<LbData> {
   try {
     const res = await fetch(
       `/api/leaderboard?seed=${encodeURIComponent(seed)}&anonId=${encodeURIComponent(getAnonId())}`,
+      { cache: "no-store" },
     );
     return (await res.json()) as LbData;
   } catch {

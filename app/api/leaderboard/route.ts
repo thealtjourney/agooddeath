@@ -52,7 +52,7 @@ export async function GET(req: Request): Promise<Response> {
 
   return NextResponse.json(
     { configured: true, top: top ?? [], total: total ?? 0, you },
-    // Absorb front-page read spikes at the edge.
-    { headers: { "Cache-Control": "public, s-maxage=10, stale-while-revalidate=30" } },
+    // The board must always reflect the latest writes — no stale caching.
+    { headers: { "Cache-Control": "no-store" } },
   );
 }

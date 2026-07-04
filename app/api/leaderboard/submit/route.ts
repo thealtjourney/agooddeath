@@ -22,6 +22,9 @@ export async function POST(req: Request): Promise<Response> {
   if (typeof seed !== "string" || typeof b !== "string" || typeof anonId !== "string") {
     return NextResponse.json({ error: "bad request" }, { status: 400 });
   }
+  if (anonId.trim().length < 8) {
+    return NextResponse.json({ error: "bad id" }, { status: 400 });
+  }
   // Leaderboards accept only real daily seeds (ISO dates), never freeplay seeds.
   if (!DATE_RE.test(seed)) {
     return NextResponse.json({ error: "not a daily seed" }, { status: 400 });
