@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --font-blackletter: "UnifrakturCook", "Luminari", "Papyrus", serif;
+  --font-body: "EB Garamond", Georgia, "Times New Roman", serif;
+}
+
+body {
+  background-color: #cdb98f;
+  color: #2a2117;
+}
+
+/* Parchment surface: layered warm gradients + a faint fibrous noise. */
+.parchment-surface {
+  background-color: #e9dcbe;
+  background-image:
+    radial-gradient(120% 120% at 15% 10%, rgba(255, 250, 235, 0.7) 0%, rgba(255, 250, 235, 0) 45%),
+    radial-gradient(120% 120% at 85% 90%, rgba(120, 90, 50, 0.18) 0%, rgba(120, 90, 50, 0) 50%),
+    radial-gradient(100% 100% at 50% 50%, rgba(210, 190, 150, 0) 60%, rgba(150, 120, 78, 0.22) 100%);
+}
+
+/* Subtle grain overlay via SVG turbulence. */
+.parchment-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Deckle-edged card frame. */
+.card-frame {
+  box-shadow:
+    inset 0 0 0 1px rgba(70, 52, 30, 0.35),
+    inset 0 0 0 6px rgba(233, 220, 190, 0.6),
+    inset 0 0 0 7px rgba(70, 52, 30, 0.28),
+    0 18px 40px -18px rgba(30, 20, 10, 0.6);
+}
+
+.rubric-cap::first-letter {
+  color: #8f2c1c;
+  font-family: var(--font-blackletter), serif;
+  font-size: 1.35em;
+  line-height: 0.9;
+}
+
+.wax-seal {
+  background: radial-gradient(circle at 35% 30%, #b5342020, #8f2c1c 45%, #6f2013 90%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2), inset 0 -3px 6px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

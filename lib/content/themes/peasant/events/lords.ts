@@ -1,0 +1,126 @@
+import type { EventDef } from "../../../../engine/types.js";
+
+export const LORDS_EVENTS: EventDef[] = [
+  // Pious but broke
+  {
+    id: "lord_pious_relic",
+    category: "lord",
+    weight: 4,
+    conditions: [{ flag: "lord:pious" }],
+    statEffects: { wealth: -1, standing: 1 },
+    textVariants: ["the lord bought another relic for the chapel with money that was, technically, yours."],
+  },
+  {
+    id: "lord_pious_charity",
+    category: "lord",
+    weight: 3,
+    tags: ["good"],
+    conditions: [{ flag: "lord:pious" }],
+    statEffects: { health: 1 },
+    textVariants: ["the lord's alms actually reached you one lean winter. A miracle in itself."],
+  },
+  // Cruel but competent
+  {
+    id: "lord_cruel_gallows",
+    category: "lord",
+    weight: 4,
+    conditions: [{ flag: "lord:cruel" }],
+    statEffects: { suspicion: -1 },
+    textVariants: ["the lord hanged a bandit at the crossroads. Grim, but the roads were quiet after."],
+  },
+  {
+    id: "lord_cruel_example",
+    category: "lord",
+    weight: 3,
+    conditions: [{ flag: "lord:cruel" }],
+    statEffects: { standing: -1 },
+    textVariants: ["the lord made an example of a poacher. You kept your head down and your hares hidden."],
+  },
+  // Absent on Crusade -> banker chain
+  {
+    id: "lord_crusade_absent",
+    category: "lord",
+    weight: 4,
+    conditions: [{ flag: "lord:crusade" }],
+    statEffects: { wealth: 1 },
+    textVariants: ["with the lord away crusading, nobody collected much of anything. A fine, lawless calm."],
+  },
+  {
+    id: "lord_pawned_to_banker",
+    category: "lord",
+    weight: 4,
+    conditions: [{ flag: "lord:crusade", notFlag: "bankerOwns" }],
+    setsFlags: ["bankerOwns"],
+    statEffects: { wealth: -1 },
+    textVariants: ["your lord pawned the village to a Genoese banker to fund the Crusade. New management."],
+  },
+  {
+    id: "bankers_men",
+    category: "lord",
+    weight: 4,
+    conditions: [{ flag: "bankerOwns" }],
+    statEffects: { wealth: -2 },
+    textVariants: ["the banker's men counted everything twice and smiled in a foreign language."],
+  },
+  // Twelve years old
+  {
+    id: "lord_child_regent",
+    category: "lord",
+    weight: 5,
+    conditions: [{ flag: "lord:child" }],
+    statEffects: { wealth: -2 },
+    textVariants: ["the boy-lord's regent invented a new tax and a new hat to go with it."],
+  },
+  // Ancient and dying -> succession chain
+  {
+    id: "lord_succession",
+    category: "lord",
+    weight: 12,
+    conditions: [{ flag: "successionPending", minAge: 20, notFlag: "successionDone" }],
+    clearsFlags: ["successionPending"],
+    setsFlags: ["successionDone", "newLord"],
+    statEffects: { suspicion: 1 },
+    textVariants: [
+      "the old lord finally died. His heirs eyed each other, and the village, hungrily.",
+      "the ancient lord expired mid-sentence. A scramble for the manor began.",
+    ],
+  },
+  {
+    id: "new_lord_cruel",
+    category: "lord",
+    weight: 4,
+    conditions: [{ flag: "newLord" }],
+    clearsFlags: ["newLord"],
+    statEffects: { standing: -1 },
+    textVariants: ["the new lord arrived with debts, ambitions, and a very literal steward."],
+  },
+  {
+    id: "new_lord_kind",
+    category: "lord",
+    weight: 3,
+    tags: ["good"],
+    conditions: [{ flag: "newLord" }],
+    clearsFlags: ["newLord"],
+    statEffects: { wealth: 1, standing: 1 },
+    textVariants: ["the new lord, wanting to be loved, forgave a year's arrears. It wouldn't last, but still."],
+  },
+  // Suspiciously wealthy
+  {
+    id: "lord_wealthy_trickle",
+    category: "lord",
+    weight: 4,
+    tags: ["good"],
+    conditions: [{ flag: "lord:wealthy" }],
+    statEffects: { wealth: 1 },
+    textVariants: ["a little of the lord's unexplained fortune trickled down. Best not to ask from where."],
+  },
+  {
+    id: "lord_wealthy_downfall",
+    category: "lord",
+    weight: 2,
+    tags: ["downfall"],
+    conditions: [{ flag: "lord:wealthy", minAge: 25 }],
+    statEffects: { wealth: -2, suspicion: 1 },
+    textVariants: ["the lord's luck ran out spectacularly, and the King's men came asking everyone questions."],
+  },
+];

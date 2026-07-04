@@ -1,0 +1,92 @@
+import type { EventDef } from "../../../../engine/types.js";
+
+/** Multi-step chains that give runs narrative shape (spec §3.1). */
+export const CHAINS: EventDef[] = [
+  // --- Literacy -> clerk -> steward (upward mobility) ---
+  {
+    id: "learn_letters",
+    category: "fortune",
+    weight: 2,
+    conditions: [{ notFlag: "literate", maxAge: 30 }],
+    setsFlags: ["literate"],
+    tags: ["good"],
+    statEffects: { standing: 1 },
+    textVariants: ["the priest, short of help, taught you your letters. A dangerous, wonderful thing for a peasant."],
+  },
+  {
+    id: "become_clerk",
+    category: "fortune",
+    weight: 4,
+    conditions: [{ flag: "literate", notFlag: "clerk", minAge: 16 }],
+    setsFlags: ["clerk"],
+    tags: ["good"],
+    statEffects: { standing: 2, wealth: 1 },
+    textVariants: ["being able to read, you became clerk to the reeve. Ink instead of mud; a promotion."],
+  },
+  {
+    id: "keep_the_rolls",
+    category: "fortune",
+    weight: 4,
+    conditions: [{ flag: "clerk" }],
+    tags: ["good"],
+    statEffects: { wealth: 1 },
+    textVariants: ["kept the manor rolls in a fair hand. The man who writes the accounts is never quite poor."],
+  },
+  {
+    id: "clerk_skims",
+    category: "justice",
+    weight: 3,
+    conditions: [{ flag: "clerk" }],
+    tags: ["downfall"],
+    statEffects: { wealth: 2, suspicion: 2 },
+    textVariants: ["a figure here, a figure there. The rolls balanced; your conscience, less so."],
+  },
+  {
+    id: "rise_to_steward",
+    category: "fortune",
+    weight: 3,
+    conditions: [{ flag: "clerk", statAtLeast: ["standing", 5], notFlag: "steward" }],
+    setsFlags: ["steward"],
+    tags: ["good"],
+    statEffects: { wealth: 3, standing: 3 },
+    textVariants: ["rose to steward of the manor. A peasant no longer, whatever the parish register still insisted."],
+  },
+  {
+    id: "steward_life",
+    category: "fortune",
+    weight: 3,
+    conditions: [{ flag: "steward" }],
+    tags: ["good"],
+    statEffects: { wealth: 2, health: 1 },
+    textVariants: ["stewardship suited you: soft bread, a dry bed, and other men doing the ploughing."],
+  },
+
+  // --- Orphan path (can feed into literacy) ---
+  {
+    id: "orphaned_young",
+    category: "family",
+    weight: 4,
+    conditions: [{ notFlag: "orphan", maxAge: 16 }],
+    setsFlags: ["orphan"],
+    statEffects: { health: -1, standing: -1 },
+    textVariants: ["fever took both your parents in a season. The parish took you in, grudgingly."],
+  },
+  {
+    id: "raised_by_nuns",
+    category: "family",
+    weight: 3,
+    conditions: [{ flag: "orphan", notFlag: "literate", maxAge: 20 }],
+    setsFlags: ["literate"],
+    tags: ["good"],
+    statEffects: { standing: 1 },
+    textVariants: ["the nuns took you in and, between the praying and the scrubbing, taught you to read."],
+  },
+  {
+    id: "parish_hardship",
+    category: "family",
+    weight: 3,
+    conditions: [{ flag: "orphan" }],
+    statEffects: { health: -1 },
+    textVariants: ["a parish upbringing is a hungry one. You learned to make a turnip last a week."],
+  },
+];
