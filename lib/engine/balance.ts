@@ -12,7 +12,7 @@ export const DEFAULT_BALANCE: BalanceConfig = {
   ageHazardGrowth: 0.0000175,
   ageHazardExp: 2,
   mitigationScale: 0.06,
-  fatalScale: 0.62,
+  fatalScale: 0.74,
 };
 
 export interface Distribution {

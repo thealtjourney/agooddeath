@@ -60,3 +60,65 @@ begin
   );
 end;
 $$;
+
+-- ============================================================
+-- Global badge rarity (distinct players who have earned each badge)
+-- ============================================================
+
+create table if not exists public.players (
+  anon_id    text primary key,
+  first_seen timestamptz not null default now()
+);
+
+create table if not exists public.badge_holders (
+  anon_id   text not null,
+  badge_id  text not null,
+  earned_at timestamptz not null default now(),
+  primary key (anon_id, badge_id)
+);
+
+create table if not exists public.badge_counts (
+  badge_id text primary key,
+  holders  int  not null default 0
+);
+
+create table if not exists public.player_count (
+  id    int primary key,
+  total int not null default 0
+);
+insert into public.player_count (id, total) values (1, 0)
+  on conflict (id) do nothing;
+
+alter table public.players       enable row level security;
+alter table public.badge_holders enable row level security;
+alter table public.badge_counts  enable row level security;
+alter table public.player_count  enable row level security;
+
+-- Report a run's earned badges. Idempotent: each (player, badge) counts once
+-- ever, and each player counts once toward the total. Safe to call every run.
+create or replace function public.report_badges(
+  p_anon   text,
+  p_badges text[]
+) returns void
+language plpgsql
+as $$
+declare
+  b text;
+begin
+  insert into public.players (anon_id) values (p_anon)
+    on conflict (anon_id) do nothing;
+  if found then
+    update public.player_count set total = total + 1 where id = 1;
+  end if;
+
+  foreach b in array p_badges loop
+    insert into public.badge_holders (anon_id, badge_id) values (p_anon, b)
+      on conflict (anon_id, badge_id) do nothing;
+    if found then
+      insert into public.badge_counts (badge_id, holders) values (b, 1)
+        on conflict (badge_id) do update
+          set holders = public.badge_counts.holders + 1;
+    end if;
+  end loop;
+end;
+$$;

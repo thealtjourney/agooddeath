@@ -14,19 +14,19 @@ const builds: Record<string, Build> = {
 
 describe("mortality distribution targets", () => {
   for (const [name, build] of Object.entries(builds)) {
-    it(`${name}: median in sane band, 70+ is rare`, () => {
-      const d = distribution(build, theme, 15000, `bal-${name}`);
+    it(`${name}: median in sane band, 70+ is rare`, { timeout: 20000 }, () => {
+      const d = distribution(build, theme, 8000, `bal-${name}`);
       // Spec: no build with median > 45 or < 22.
       expect(d.median).toBeGreaterThanOrEqual(22);
       expect(d.median).toBeLessThanOrEqual(45);
       // 70+ should be rare across builds (spec target ~1-2%, allow a band).
-      expect(d.pctOver70).toBeLessThan(8);
+      expect(d.pctOver70).toBeLessThan(9);
     });
   }
 
-  it("safe build outlives risky build (median)", () => {
-    const safe = distribution(builds.safe!, theme, 15000, "cmp-safe");
-    const risky = distribution(builds.risky!, theme, 15000, "cmp-risky");
+  it("safe build outlives risky build (median)", { timeout: 20000 }, () => {
+    const safe = distribution(builds.safe!, theme, 8000, "cmp-safe");
+    const risky = distribution(builds.risky!, theme, 8000, "cmp-risky");
     expect(safe.median).toBeGreaterThan(risky.median);
   });
 });

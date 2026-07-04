@@ -13,4 +13,9 @@ export const DEATHS: DeathCause[] = [
   { id: "the_gripes", category: "disease", text: "died of the gripes, having eaten something the dog refused.", icon: "bed" },
   { id: "worn_out", category: "old_age", text: "simply wore out, like a good spade, and was set down at last.", icon: "bed" },
   { id: "a_hard_winter", category: "disease", text: "did not see the spring, as the old and the unlucky often do not.", icon: "bed" },
+  { id: "the_stone", category: "disease", text: "died of the stone, having refused the surgeon's knife, which was the wiser refusal.", icon: "bed" },
+  { id: "childbed", category: "family", text: "died in childbed, as too many did, and was mourned by the whole parish.", icon: "bed" },
+  { id: "apoplexy", category: "old_age", text: "was carried off by an apoplexy mid-argument, winning it by default.", icon: "bed" },
+  { id: "a_surfeit", category: "disease", text: "died of a surfeit of eels, which is a very Muckle Sump way to go.", icon: "bed" },
+  { id: "consumption", category: "disease", text: "wasted slowly of a consumption, coughing politely to the end.", icon: "bed" },
 ];

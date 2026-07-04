@@ -65,7 +65,7 @@ export function DeathCard({
       const { state, newly } = recordRun(earnedIds, runId);
       setBadgeState(state);
       setNewly(newly);
-      rarityService.report(earnedIds);
+      rarityService.report(life.seed, encodeBuild(life.build));
     }
     return () => {
       live = false;
