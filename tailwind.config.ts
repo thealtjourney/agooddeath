@@ -36,11 +36,22 @@ export default {
           "0%,100%": { opacity: "1" },
           "50%": { opacity: "0.55" },
         },
+        pop: {
+          "0%": { opacity: "0", transform: "scale(0.6)" },
+          "70%": { opacity: "1", transform: "scale(1.08)" },
+          "100%": { transform: "scale(1)" },
+        },
+        riseIn: {
+          "0%": { opacity: "0", transform: "translateY(14px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         flashIn: "flashIn 0.4s ease-out both",
         stamp: "stamp 0.5s cubic-bezier(0.2,0.8,0.2,1) both",
         pulseSoft: "pulseSoft 1.4s ease-in-out infinite",
+        pop: "pop 0.5s cubic-bezier(0.2,0.8,0.2,1) both",
+        riseIn: "riseIn 0.5s ease-out both",
       },
     },
   },

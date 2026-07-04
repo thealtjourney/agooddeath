@@ -9,6 +9,7 @@ import { rarityService, type BadgeRarity } from "../lib/game/rarity.js";
 import { encodeBuild } from "../lib/game/share-url.js";
 import { ShareBar } from "./ShareBar.js";
 import { WoodcutIcon } from "./WoodcutIcon.js";
+import { CountUp } from "./CountUp.js";
 import { BadgeStrip } from "./BadgeStrip.js";
 import { Reliquary } from "./Reliquary.js";
 import { Leaderboard } from "./Leaderboard.js";
@@ -88,7 +89,7 @@ export function DeathCard({
         </button>
       )}
       <article
-        className={`parchment-surface parchment-grain card-frame relative overflow-hidden rounded-sm border-2 ${FRAME[variant]} p-6 sm:p-8`}
+        className={`parchment-surface parchment-grain card-frame animate-riseIn relative overflow-hidden rounded-sm border-2 ${FRAME[variant]} p-6 sm:p-8`}
       >
         {variant === "good" && (
           <p className="mb-3 text-center font-black text-lg tracking-wide text-gilt">
@@ -109,7 +110,7 @@ export function DeathCard({
           <WoodcutIcon
             category={life.deathCauseId}
             good={variant === "good"}
-            className="h-24 w-24 text-ink"
+            className="h-24 w-24 animate-pop text-ink"
           />
         </div>
 
@@ -141,7 +142,7 @@ export function DeathCard({
           <p
             className={`font-black leading-none ${variant === "good" ? "text-gilt" : "text-ink"} text-6xl`}
           >
-            {record.score}
+            <CountUp value={record.score} duration={900} />
           </p>
           {!shared && result && (
             <p className="mt-2 font-body text-[13px] text-ink-soft">
