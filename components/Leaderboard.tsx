@@ -105,6 +105,15 @@ export function Leaderboard({ seed, b }: { seed: string; b: string }) {
         ))}
       </ol>
 
+      <div className="mt-2 flex items-center justify-center gap-3">
+        <a
+          href="/leaderboard"
+          className="font-body text-[11px] uppercase tracking-widest text-rubric underline-offset-2 hover:underline"
+        >
+          Full register →
+        </a>
+      </div>
+
       <div className="mt-2 text-center">
         {editing ? (
           <div className="flex items-center justify-center gap-2">

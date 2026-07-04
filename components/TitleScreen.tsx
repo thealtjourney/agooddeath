@@ -16,6 +16,8 @@ import { fetchLeaderboard, type LbData } from "../lib/game/leaderboard.js";
 import { ChoiceIcon } from "./ChoiceIcon.js";
 import { WoodcutIcon } from "./WoodcutIcon.js";
 import { Reliquary } from "./Reliquary.js";
+import { SpecimenTicker } from "./SpecimenTicker.js";
+import { Flourish } from "./Flourish.js";
 
 export function TitleScreen({
   onDaily,
@@ -71,7 +73,8 @@ export function TitleScreen({
         <h1 className="mt-2 font-black text-6xl leading-none text-ink sm:text-8xl">
           A&nbsp;Good&nbsp;Death
         </h1>
-        <ChoiceIcon id="peasant" className="mt-5 h-20 w-20 text-ink/80" />
+        <Flourish className="mt-4" />
+        <ChoiceIcon id="peasant" className="mt-4 h-20 w-20 text-ink/80" />
         <p className="mt-5 max-w-md font-body text-[18px] leading-relaxed text-ink-soft">
           Pick your trade, village, lord and one lucky item. Then find out how
           long you last in medieval England. Score: age at death.
@@ -110,45 +113,20 @@ export function TitleScreen({
         )}
       </section>
 
-      {/* ---------- Example card ---------- */}
+      {/* ---------- Example card (animated) ---------- */}
       <section className="mx-auto max-w-md px-6 pb-14">
         <p className="mb-3 text-center font-body text-[11px] uppercase tracking-[0.3em] text-ink-faded">
           A specimen record
         </p>
-        <article className="parchment-surface card-frame rounded-sm border-2 border-ink/40 p-5">
-          <header className="text-center">
-            <p className="font-body text-[10px] uppercase tracking-[0.3em] text-ink-faded">
-              The Parish Record of
-            </p>
-            <h2 className="mt-1 font-black text-2xl leading-tight text-ink">
-              {spec.title.replace("The Parish Record of ", "")}
-            </h2>
-          </header>
-          <div className="my-4 flex justify-center">
-            <WoodcutIcon category={example.cause} className="h-16 w-16 text-ink" />
-          </div>
-          <div className="mx-auto max-w-sm space-y-1 font-body text-[14px] leading-relaxed text-ink-soft">
-            {spec.lines.slice(0, 4).map((l, k) => (
-              <p key={k}>
-                <span className="font-semibold text-rubric">{l.slice(0, l.indexOf(":") + 1)}</span>
-                {l.slice(l.indexOf(":") + 1)}
-              </p>
-            ))}
-            <p className="pt-1 font-semibold text-ink">
-              <span className="text-rubric">
-                {spec.deathLine.slice(0, spec.deathLine.indexOf(":") + 1)}
-              </span>
-              {spec.deathLine.slice(spec.deathLine.indexOf(":") + 1)}
-            </p>
-            <p className="pt-2 text-center italic text-ink">{spec.survivedBy}</p>
-          </div>
-          <div className="mt-4 border-t border-ink/25 pt-3 text-center">
-            <p className="font-body text-[10px] uppercase tracking-[0.3em] text-ink-faded">
-              Age at Death
-            </p>
-            <p className="font-black text-5xl leading-none text-ink">{spec.score}</p>
-          </div>
-        </article>
+        <SpecimenTicker
+          name={spec.title.replace("The Parish Record of ", "")}
+          lines={spec.lines.slice(0, 4)}
+          deathLine={spec.deathLine}
+          survivedBy={spec.survivedBy}
+          score={spec.score}
+          cause={example.cause}
+          startAge={theme.startAge}
+        />
       </section>
 
       {/* ---------- Social proof ---------- */}
@@ -174,6 +152,12 @@ export function TitleScreen({
                 </li>
               ))}
             </ol>
+            <a
+              href="/leaderboard"
+              className="mt-3 inline-block font-body text-[11px] uppercase tracking-widest text-rubric underline-offset-2 hover:underline"
+            >
+              See the full register →
+            </a>
           </>
         ) : (
           <p className="mt-2 font-body text-[15px] italic text-ink-soft">
@@ -181,6 +165,8 @@ export function TitleScreen({
           </p>
         )}
       </section>
+
+      <Flourish className="pb-12" />
 
       {/* ---------- How it works ---------- */}
       <section className="mx-auto max-w-3xl px-6 pb-14">
@@ -200,6 +186,8 @@ export function TitleScreen({
           </Step>
         </div>
       </section>
+
+      <Flourish className="pb-12" />
 
       {/* ---------- SEO / about ---------- */}
       <section className="mx-auto max-w-2xl px-6 pb-16">
