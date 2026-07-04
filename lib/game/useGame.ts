@@ -85,6 +85,12 @@ export function useGame() {
   );
   const goHome = useCallback(() => dispatch({ type: "home" }), []);
 
+  /** Start a build on a specific seed (a head-to-head challenge link). */
+  const startChallenge = useCallback(
+    (seed: string) => dispatch({ type: "start", daily: true, seed }),
+    [],
+  );
+
   const select = useCallback(
     (slot: string, optionId: string) => dispatch({ type: "select", slot, optionId }),
     [],
@@ -147,6 +153,7 @@ export function useGame() {
     state,
     startDaily,
     startFreeplay,
+    startChallenge,
     goHome,
     select,
     allChosen,

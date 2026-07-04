@@ -36,6 +36,12 @@ export function SharedRun({ seed, b }: { seed: string; b?: string }) {
         <p className="font-body text-xs uppercase tracking-[0.3em] text-ink-faded">
           A parish record, shared with you
         </p>
+        <a
+          href={`/?seed=${encodeURIComponent(seed)}`}
+          className="mt-3 inline-block rounded-sm border border-rubric bg-rubric px-5 py-2.5 font-body text-sm font-semibold uppercase tracking-widest text-parchment-light hover:brightness-110"
+        >
+          Play this same world → beat them
+        </a>
       </div>
       <DeathCard life={life} daily mode="shared" />
     </main>

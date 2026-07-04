@@ -65,6 +65,18 @@ export function dailyBriefing(seed: string): string[] {
   return briefingLines(summariseWorld(world));
 }
 
+/** A compact glyph string of a day's threats, for Wordle-style shares. */
+export function threatGlyphs(seed: string): string {
+  const rng = makeRng(`${theme.id}:${seed}`);
+  const world = buildWorld(rng, theme.startAge, theme.maxAge);
+  const b = summariseWorld(world);
+  let g = "";
+  g += "☠️".repeat(Math.min(b.plagues, 4)); // skull per plague year
+  if (b.warStartAge !== null) g += "⚔️"; // crossed swords
+  if (b.famines >= 12) g += "🌾"; // sheaf of wheat
+  return g || "☀️"; // sun = a rare quiet age
+}
+
 /** Pretty date for the card footer, e.g. "4 July 2026". */
 export function prettyDate(seed: string): string {
   const d = new Date(seed);

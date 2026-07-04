@@ -130,7 +130,15 @@ export function TitleScreen({
       </section>
 
       <footer className="mx-auto max-w-2xl px-6 pb-12 text-center font-body text-[11px] text-ink-faded">
-        A new parish record every day · no account, no cost · agooddeath.app
+        <p>A new parish record every day · no account, no cost</p>
+        <p className="mt-1">
+          <Link href="/how-it-works" className="hover:text-ink">How it works</Link>
+          {" · "}
+          <Link href="/privacy" className="hover:text-ink">Privacy</Link>
+          {" · "}
+          <Link href="/terms" className="hover:text-ink">Terms</Link>
+          {" · agooddeath.app"}
+        </p>
       </footer>
     </main>
   );

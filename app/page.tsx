@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useGame } from "../lib/game/useGame.js";
 import { TitleScreen } from "../components/TitleScreen.js";
 import { BuildScreen } from "../components/BuildScreen.js";
@@ -12,6 +13,7 @@ export default function Page() {
     state,
     startDaily,
     startFreeplay,
+    startChallenge,
     goHome,
     select,
     allChosen,
@@ -20,6 +22,15 @@ export default function Page() {
     finish,
     playAgain,
   } = useGame();
+
+  // Head-to-head challenge: /?seed=YYYY-MM-DD drops you into that exact world.
+  useEffect(() => {
+    const s = new URLSearchParams(window.location.search).get("seed");
+    if (s && /^\d{4}-\d{2}-\d{2}$/.test(s)) {
+      startChallenge(s);
+      window.history.replaceState(null, "", "/");
+    }
+  }, [startChallenge]);
 
   if (state.phase === "title") {
     return <TitleScreen onDaily={startDaily} onFreeplay={startFreeplay} />;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { LifeRecord } from "../lib/engine/types.js";
 import type { ParishRecord } from "../lib/content/themes/peasant/record.js";
 import { runUrl, ogImagePath } from "../lib/game/share-url.js";
+import { threatGlyphs, prettyDate } from "../lib/game/theme-ui.js";
 import { event } from "../lib/game/analytics.js";
 
 export function ShareBar({
@@ -26,7 +27,12 @@ export function ShareBar({
 
   const name = record.title.replace("The Parish Record of ", "");
   const url = runUrl(life.seed, life.build);
-  const shareText = `${name} — dead at ${record.score}. ${record.survivedBy} How long do you last?`;
+  const isDailySeed = /^\d{4}-\d{2}-\d{2}$/.test(life.seed);
+  // Wordle-style, frictionless text share (works with no image).
+  const shareText =
+    daily && isDailySeed
+      ? `A Good Death — ${prettyDate(life.seed)}\n${threatGlyphs(life.seed)}  I lasted to ${record.score}.\nSame world for everyone today. Beat me:`
+      : `${name} — dead at ${record.score}. ${record.survivedBy} How long do you last?`;
   const imgPath = ogImagePath(life.seed, life.build);
 
   const fetchImage = async (): Promise<File | null> => {

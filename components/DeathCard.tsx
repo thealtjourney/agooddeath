@@ -13,6 +13,7 @@ import { CountUp } from "./CountUp.js";
 import { BadgeStrip } from "./BadgeStrip.js";
 import { Reliquary } from "./Reliquary.js";
 import { Leaderboard } from "./Leaderboard.js";
+import { AdSlot } from "./AdSlot.js";
 
 type Variant = "standard" | "plague" | "good";
 
@@ -211,6 +212,8 @@ export function DeathCard({
         onAgain={onAgain}
         onFreeplay={onFreeplay}
       />
+
+      <AdSlot />
     </div>
   );
 }
